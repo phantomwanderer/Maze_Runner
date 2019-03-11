@@ -61,8 +61,8 @@ int setup()
 {
     for(; maze[locationY][locationX] != ' ';)
     {
-        locationX = rand()%55;
-        locationY = rand()%34;  
+        locationX = rand()%55; x = locationX;
+        locationY = rand()%34;  y = locationY;
     }
     for(;maze[Y[0]][X[0]] != ' ';)
     {
@@ -295,7 +295,7 @@ void display_maze()
 }
 */
 
-void specialkey_playing(int key, int x, int y)
+void specialkey_playing(int key, int xr, int yr-)
 {
     
     switch(key) 
@@ -304,7 +304,7 @@ void specialkey_playing(int key, int x, int y)
         if(maze[locationY-1][locationX] == ' ')
             {
                 maze[locationY][locationX] = ' ';
-                locationY -= 1;
+                locationY -= 1; y--;
                 maze[locationY][locationX] = '@';
             }
         break;
@@ -312,14 +312,14 @@ void specialkey_playing(int key, int x, int y)
         if(maze[locationY + 1][locationX] == 'X')
         {
             maze[locationY][locationX] = ' ';
-            locationY += 1;
+            locationY += 1; y++;
             maze[locationY][locationX] = '@';
             //FinalPage With YOUWON Function Call;
         } 
         else if(maze[locationY+1][locationX] == ' ')
             {
                 maze[locationY][locationX] = ' ';
-                locationY += 1;
+                locationY += 1; y++;
                 maze[locationY][locationX] = '@';
             }
         break;
@@ -327,14 +327,14 @@ void specialkey_playing(int key, int x, int y)
         if(maze[locationY][locationX - 1] == 'X')
         {
             maze[locationY][locationX] = ' ';
-            locationX -= 1;
+            locationX -= 1; x--;
             maze[locationY][locationX] = '@';
             //FinalPage With YOUWON Function Call;
         } 
         else if(maze[locationY][locationX-1] == ' ')
             {
                 maze[locationY][locationX] = ' ';
-                locationX -= 1;
+                locationX -= 1; x--;
                 maze[locationY][locationX] = '@';
             }
         break;
@@ -342,14 +342,14 @@ void specialkey_playing(int key, int x, int y)
         if(maze[locationY][locationX + 1] == 'X')
         {
             maze[locationY][locationX] = ' ';
-            locationX += 1;
+            locationX += 1; x++;
             maze[locationY][locationX] = '@';
             //FinalPage With YOUWON Function Call;
         } 
         else if(maze[locationY][locationX+1] == ' ')
             {
                 maze[locationY][locationX] = ' ';
-                locationX += 1;
+                locationX += 1; x++;
                 maze[locationY][locationX] = '@';
             }
         break;
