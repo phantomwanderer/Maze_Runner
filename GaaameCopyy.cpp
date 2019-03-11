@@ -1,19 +1,19 @@
-#include <GL/glut.h>
+#include <GL/glut.h>//glut libraries
 #include <iostream>
 #include <math.h>
 #include <stdlib.h>
 #include <unistd.h>
-
+//Declared required header libraries
 using namespace std;
 
 
-int locationY , locationX ;
-int x = locationX, y = locationY;
+int locationY , locationX ;//player location
+int x = locationX, y = locationY;//previous locations needed for logic
 int X[3], Y[3], a1, b1, a2, b2, A, B;
 int GameCompletion, WindowID;
-int SpeedBoost, Weapon;
+int SpeedBoost, Weapon;//extra feauture variables
 
-char maze[35][56]={  
+char maze[35][56]={  //hard coded maze. serves as input for opengl
 {"#######################################################"},
 {"#  #           #           #        #              #  #"},
 {"#  #           #           #        #              #  #"},
@@ -47,18 +47,18 @@ char maze[35][56]={
 {"#  #  ####  ####  ####  #######  ####  #  #######  #  #"},
 {"#  #              #        #           #           #  #"},
 {"#  #              #        #           #           #  #"},
-{"#XX####################################################"} };  
+{"#XX####################################################"} };
 
 //maze[2][2] = '*';
 //maze [10][10] = '*';
 //maze [30][20] = '*';
 
-void initGL() 
+void initGL()
 {
-   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); 
+   glClearColor(0.0f, 0.0f, 0.0f, 1.0f); //initializing the screen
 }
 
-int setup()
+int setup()//setup of players and maze
 {
     for(; maze[locationY][locationX] != ' ';)
     {
@@ -86,26 +86,26 @@ int setup()
     for(;maze[a1][b1] != ' ';)
     {
         a1 = rand()%34;
-        b1 = rand()%55; 
+        b1 = rand()%55;
     }
     maze[a1][b1] = '&';
     for(;maze[a2][b2] != ' ';)
     {
         a2 = rand()%34;
-        b2 = rand()%55; 
+        b2 = rand()%55;
     }
     maze[a2][b2] = '&';
     for(;maze[A][B] != ' ';)
     {
         A = rand()%34;
-        B = rand()%55; 
+        B = rand()%55;
     }
     maze[A][B] = 's';
     return 0;
 }
 
 
-void troll(){
+void troll(){//troll function. logic for troll moment using Manhattan Distance Concept
     int i,j,k=0;
     while(k<3){
 	    i=X[k];
@@ -115,29 +115,29 @@ void troll(){
 	    else if(maze[Y[k]+1][X[k]]=='@')   {   Y[k]=Y[k]+1;  GameCompletion = -1;  } //FunctinoCall for YOULOST  }
 	    else if(maze[Y[k]][X[k]+1]=='@')  {  X[k]=X[k]+1;  GameCompletion = -1;  }  //FunctinoCall for YOULOST   }
 	    else if(maze[Y[k]][X[k]-1]=='@')  {  X[k]=X[k]-1; GameCompletion = -1;   }  //FunctinoCall for YOULOST   }
-	    else if(maze[Y[k]][X[k]]=='@')  continue; 
+	    else if(maze[Y[k]][X[k]]=='@')  continue;
 	    else{
 		int p=1,q=1;
                 //Assign p and q values to in according to the position(left, top, bottom, right) of the troll w.r.t. player
 		if(X[k]>x)   p=-1;
 		if(Y[k]>y)   q=-1;
                 //Check if the troll and the player are in same line
-                if(X[k]==x){     
-                    if(maze[Y[k]+q][X[k]]==' ')  Y[k]=Y[k]+q; 
-		    else if(maze[Y[k]-q][X[k]]==' ')  Y[k]=Y[k]-q; 
+                if(X[k]==x){
+                    if(maze[Y[k]+q][X[k]]==' ')  Y[k]=Y[k]+q;
+		    else if(maze[Y[k]-q][X[k]]==' ')  Y[k]=Y[k]-q;
 		    else if(maze[Y[k]][X[k]+p]==' ')  X[k]=X[k]+p;
-		    else if(maze[Y[k]][X[k]-p]==' ')  X[k]=X[k]-p; 
+		    else if(maze[Y[k]][X[k]-p]==' ')  X[k]=X[k]-p;
                 }
-                else if(Y[k]==y){    
-                        if(maze[Y[k]][X[k]+p]==' ')  X[k]=X[k]+p;  
+                else if(Y[k]==y){
+                        if(maze[Y[k]][X[k]+p]==' ')  X[k]=X[k]+p;
 		        else if(maze[Y[k]][X[k]-p]==' ')  X[k]=X[k]-p;
 		        else if(maze[Y[k]+q][X[k]]==' ')  Y[k]=Y[k]+q;
 		        else if(maze[Y[k]-q][X[k]]==' ')  Y[k]=Y[k]-q;
                 }
                 //Check in which direction is the troll near to the player
-                else if(abs(X[k]-x)<abs(Y[k]-y)){   
+                else if(abs(X[k]-x)<abs(Y[k]-y)){
                        /* If the troll is near to the player in x-direction, first see if the troll could be moved to that position.
-                       If no, then try in y-direction. If both does not satisify, then find for x and y direction in opposite side. 
+                       If no, then try in y-direction. If both does not satisify, then find for x and y direction in opposite side.
                        */
 			if(maze[Y[k]][X[k]+p]==' ')  X[k]=X[k]+p;   //Check for the most feasible move
 			else if(maze[Y[k]+q][X[k]]==' ')  Y[k]=Y[k]+q;
@@ -146,14 +146,14 @@ void troll(){
 		}
 		else{
                        /* If the troll is near to the player in y-direction, first see if the troll could be moved to that position.
-                       If no, then try in x-direction. If both does not satisify, then find for x and y direction in opposite side. 
+                       If no, then try in x-direction. If both does not satisify, then find for x and y direction in opposite side.
                        */
-		    if(maze[Y[k]+q][X[k]]==' ') Y[k]=Y[k]+q; 
+		    if(maze[Y[k]+q][X[k]]==' ') Y[k]=Y[k]+q;
 		    else if(maze[Y[k]][X[k]+p]==' ')  X[k]=X[k]+p;
-		    else if(maze[Y[k]-q][X[k]]==' ')  Y[k]=Y[k]-q; 
+		    else if(maze[Y[k]-q][X[k]]==' ')  Y[k]=Y[k]-q;
 		    else if(maze[Y[k]][X[k]-p]==' ')  X[k]=X[k]-p;
 		}
-	  } 
+	  }
 	  maze[j][i]=' ';
 	  maze[Y[k]][X[k]]='*';
 	  k++;
@@ -161,21 +161,21 @@ void troll(){
 
 }
 
-void display_maze()
+void display_maze()//converting the hardcode to opengl code .
 {
-    
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
+
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     glutFullScreen();
-    
+
     //int mazeWidth = glutGet(GLUT_WINDOW_WIDTH) - 250;
     //int mazeHeight = glutGet(GLUT_WINDOW_HEIGHT) - 150;
-    
-    double blockWidth = 2.0 / 61.0 ;   
-    double blockHeight = 1.5 / 34.0 ;  
+
+    double blockWidth = 2.0 / 61.0 ;
+    double blockHeight = 1.5 / 34.0 ;
     float beginX = -0.9f;
     float beginY = 0.725f;
-   
+
     for(int i = 0; i < 34; i++)
     {
         for(int j = 0; j < 55; j++)
@@ -183,11 +183,11 @@ void display_maze()
             if(maze[i][j] == '#')
             {
                 glBegin(GL_QUADS);
-                   glColor3f(1.0f, 1.0f, 1.0f); 
+                   glColor3f(1.0f, 1.0f, 1.0f);
                    glVertex2f(beginX + blockWidth , beginY);
                    glVertex2f(beginX , beginY);
                    glVertex2f(beginX , beginY - blockHeight);
-                   glVertex2f(beginX + blockWidth , beginY - blockHeight);                 
+                   glVertex2f(beginX + blockWidth , beginY - blockHeight);
                 glEnd();
             }
 
@@ -196,12 +196,12 @@ void display_maze()
             {
                 if(SpeedBoost == 0 && Weapon == 0)
                 {
-                    glBegin(GL_TRIANGLES);          
-                    glColor3f(0.0f, 1.0f, 0.0f); 
+                    glBegin(GL_TRIANGLES);
+                    glColor3f(0.0f, 1.0f, 0.0f);
                     glVertex2f(beginX + (1.0/61.0), beginY - (0.05/15.0));
-                    glColor3f(0.0f, 1.0f, 0.0f);         
+                    glColor3f(0.0f, 1.0f, 0.0f);
                     glVertex2f(beginX + (0.65 / 305.0), beginY -blockHeight + (0.3/34.0));
-                    glColor3f(0.0f, 1.0f, 0.0f); 
+                    glColor3f(0.0f, 1.0f, 0.0f);
                     glVertex2f(beginX + (8.0 / 305.0), beginY -blockHeight + (0.3/34.0));
                     glColor3f(0.0f, 1.0f, 0.0f);
                     glVertex2f(beginX + (0.65 / 305.0), beginY - (0.3/34.0));
@@ -213,10 +213,10 @@ void display_maze()
                 }
                 else if(SpeedBoost == 0 && Weapon == 1)
                 {
-                    glBegin(GL_TRIANGLES);          
-                    glColor3f(1.0f, 1.0f, 0.0f); 
+                    glBegin(GL_TRIANGLES);
+                    glColor3f(1.0f, 1.0f, 0.0f);
                     glVertex2f(beginX + (1.0/61.0), beginY - (0.05/15.0));
-                    glColor3f(1.0f, 1.0f, 0.0f);         
+                    glColor3f(1.0f, 1.0f, 0.0f);
                     glVertex2f(beginX + (0.65 / 305.0), beginY -blockHeight + (0.3/34.0));
                     glColor3f(1.0f, 1.0f, 0.0f);
                     glVertex2f(beginX + (8.0 / 305.0), beginY -blockHeight + (0.3/34.0));
@@ -230,29 +230,29 @@ void display_maze()
                 }
                 else if(SpeedBoost == 1 && Weapon == 0)
                 {
-                    glBegin(GL_TRIANGLES);          
-                    glColor3f(0.5f, 0.0f, 0.5f); 
+                    glBegin(GL_TRIANGLES);
+                    glColor3f(0.5f, 0.0f, 0.5f);
                     glVertex2f(beginX + (1.0/61.0), beginY - (0.05/15.0));
-                    glColor3f(0.5f, 0.0f, 0.5f);         
+                    glColor3f(0.5f, 0.0f, 0.5f);
                     glVertex2f(beginX + (0.65 / 305.0), beginY -blockHeight + (0.3/34.0));
-                    glColor3f(0.5f, 0.0f, 0.5f); 
+                    glColor3f(0.5f, 0.0f, 0.5f);
                     glVertex2f(beginX + (8.0 / 305.0), beginY -blockHeight + (0.3/34.0));
-                    glColor3f(0.5f, 0.0f, 0.5f); 
+                    glColor3f(0.5f, 0.0f, 0.5f);
                     glVertex2f(beginX + (0.65 / 305.0), beginY - (0.3/34.0));
-                    glColor3f(0.5f, 0.0f, 0.5f); 
+                    glColor3f(0.5f, 0.0f, 0.5f);
                     glVertex2f(beginX + (1.0/61.0), beginY -blockHeight + (0.05/15.0));
-                    glColor3f(0.5f, 0.0f, 0.5f); 
+                    glColor3f(0.5f, 0.0f, 0.5f);
                     glVertex2f(beginX + (8.0 / 305.0), beginY - (0.3/34.0));
                     glEnd();
                 }
 
-                
-            } 
+
+            }
 
             else if(maze[i][j] == '*')
             {
-                glBegin(GL_TRIANGLES);          
-                    glColor3f(1.0f, 0.0f, 0.0f); 
+                glBegin(GL_TRIANGLES);
+                    glColor3f(1.0f, 0.0f, 0.0f);
                     glVertex2f(beginX + (0.65 / 305.0), beginY - (0.3/34.0));
                     glVertex2f(beginX + (1.0/61.0), beginY -blockHeight + (0.05/15.0));
                     glVertex2f(beginX + (8.0 / 305.0), beginY - (0.3/34.0));
@@ -290,17 +290,17 @@ void display_maze()
     }
     glFlush();
     //troll();
-   
+
 }
 
 
 
-void specialkey_playing(int key, int xr, int yr)
+void specialkey_playing(int key, int xr, int yr)//key input from user. opengl function
 {
-    
-    switch(key) 
+
+    switch(key)
     {
-        case GLUT_KEY_UP: 
+        case GLUT_KEY_UP:
         if(maze[locationY-1][locationX] == ' ' && SpeedBoost == 1 && maze[locationY-2][locationX] == ' ')
             {
                 maze[locationY][locationX] = ' ';
@@ -314,7 +314,7 @@ void specialkey_playing(int key, int xr, int yr)
                 locationY -= 1; y--;
                 maze[locationY][locationX] = '@';
             }
-            
+
         else if(maze[locationY-1][locationX] == 's' && SpeedBoost == 0 )
             {
                 maze[locationY][locationX] = ' ';
@@ -322,7 +322,7 @@ void specialkey_playing(int key, int xr, int yr)
                 maze[locationY][locationX] = '@';
                 SpeedBoost = 1;
             }
-        
+
         /* else if((maze[locationY-1][locationX] == 's' || maze[locationY-2][locationX] == 's') && SpeedBoost == 1 )
             {
                 maze[locationY][locationX] = ' ';
@@ -337,8 +337,8 @@ void specialkey_playing(int key, int xr, int yr)
             maze[locationY][locationX] = ' ';
             locationY += 1; y++;
             maze[locationY][locationX] = '@';
-            GameCompletion = 1; 
-        } 
+            GameCompletion = 1;
+        }
         else if(maze[locationY+1][locationX] == ' ' && SpeedBoost == 1 && maze[locationY+2][locationX] == ' ')
             {
                 maze[locationY][locationX] = ' ';
@@ -360,14 +360,14 @@ void specialkey_playing(int key, int xr, int yr)
                 SpeedBoost = 1;
             }
             break;
-        case GLUT_KEY_LEFT: 
+        case GLUT_KEY_LEFT:
         if(maze[locationY][locationX - 1] == 'X')
             {
                 maze[locationY][locationX] = ' ';
                 locationX -= 1; x--;
                 maze[locationY][locationX] = '@';
-                GameCompletion = 1; 
-            } 
+                GameCompletion = 1;
+            }
         else if(maze[locationY][locationX - 1] == ' ' && SpeedBoost == 1 && maze[locationY][locationX - 2] == ' ')
             {
                 maze[locationY][locationX] = ' ';
@@ -395,7 +395,7 @@ void specialkey_playing(int key, int xr, int yr)
             maze[locationY][locationX] = ' ';
             locationX += 1; x++;
             maze[locationY][locationX] = '@';
-            GameCompletion = 1; 
+            GameCompletion = 1;
         }
         else if(maze[locationY][locationX + 1] == ' ' && SpeedBoost == 1 && maze[locationY][locationX + 2] == ' ')
             {
@@ -403,14 +403,14 @@ void specialkey_playing(int key, int xr, int yr)
                 locationX += 2; x += 2;
                 maze[locationY][locationX] = '@';
                 SpeedBoost = 1;
-            } 
+            }
         else if(maze[locationY][locationX+1] == ' ' )
             {
                 maze[locationY][locationX] = ' ';
                 locationX += 1; x++;
                 maze[locationY][locationX] = '@';
             }
-        
+
         else if(maze[locationY][locationX + 1] == 's' && SpeedBoost == 0 )
             {
                 maze[locationY][locationX] = ' ';
@@ -426,14 +426,14 @@ void specialkey_playing(int key, int xr, int yr)
 }
 
 /*
-void reshape(GLsizei width, GLsizei height) {  
-   if (height == 0) height = 1;                
+void reshape(GLsizei width, GLsizei height) {
+   if (height == 0) height = 1;
    GLfloat aspect = (GLfloat)width / (GLfloat)height;
- 
+
     glViewport(0, 0, width, height);
- 
-   glMatrixMode(GL_PROJECTION);  
-   glLoadIdentity();             
+
+   glMatrixMode(GL_PROJECTION);
+   glLoadIdentity();
    if (width >= height) {
       gluOrtho2D(-1.0 * aspect, 1.0 * aspect, -1.0, 1.0);
    } else {
@@ -442,28 +442,28 @@ void reshape(GLsizei width, GLsizei height) {
 }
 */
 
-void display_WIN()
+void display_WIN()//finction to display the WIN  screen if in case the player completes the game successfully
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
      //Win Function
    glBegin(GL_LINE_STRIP);
-      glColor3f(1.0f, 1.0f, 1.0f); 
+      glColor3f(1.0f, 1.0f, 1.0f);
       glVertex2f(0.15f, -0.25f);
       glVertex2f(0.15f, 0.25f);
    glEnd();
-   
+
    glBegin(GL_LINE_STRIP);
-      glColor3f(1.0f, 1.0f, 1.0f); 
+      glColor3f(1.0f, 1.0f, 1.0f);
       glVertex2f(0.4f, -0.25f);
       glVertex2f(0.4f, 0.25f);
       glVertex2f(0.7f, -0.25f);
       glVertex2f(0.7f, 0.25f);
 
    glEnd();
-   
+
    glBegin(GL_LINE_STRIP);
-      glColor3f(1.0f, 1.0f, 1.0f); 
+      glColor3f(1.0f, 1.0f, 1.0f);
       glVertex2f(-0.1f, 0.25f);
       glVertex2f(-0.25f, -0.25f);
       glVertex2f(-0.4f, 0.25f);
@@ -474,13 +474,13 @@ void display_WIN()
    glFlush();
 }
 
-void display_LOSE()
+void display_LOSE()//In case the player encounters a troll, the game ends, hence the LOSE Screen
 {
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);  
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     //Lose function
    glBegin(GL_LINE_STRIP);
-      glColor3f(1.0f, 1.0f, 1.0f); 
+      glColor3f(1.0f, 1.0f, 1.0f);
       glVertex2f(0.125f, -0.25f);
       glVertex2f(0.375f, -0.25f);
       glVertex2f(0.375f, 0.0f);
@@ -488,32 +488,32 @@ void display_LOSE()
       glVertex2f(0.125f, 0.25f);
       glVertex2f(0.375f, 0.25f);
    glEnd();
-   
+
    glBegin(GL_LINE_STRIP);
-      glColor3f(1.0f, 1.0f, 1.0f); 
+      glColor3f(1.0f, 1.0f, 1.0f);
       glVertex2f(0.875f, -0.25f);
       glVertex2f(0.625f, -0.25f);
       glVertex2f(0.625f, 0.25f);
       glVertex2f(0.875f, 0.25f);
 
    glEnd();
-   
+
    glBegin(GL_LINES);
-      glColor3f(1.0f, 1.0f, 1.0f); 
+      glColor3f(1.0f, 1.0f, 1.0f);
       glVertex2f(0.875f, 0.0f);
       glVertex2f(0.625f, 0.0f);
-   glEnd();  
-   
+   glEnd();
+
    glBegin(GL_LINE_LOOP);
-      glColor3f(1.0f, 1.0f, 1.0f); 
+      glColor3f(1.0f, 1.0f, 1.0f);
       glVertex2f(-0.125f, -0.25f);
       glVertex2f(-0.375f, -0.25f);
       glVertex2f(-0.375f, 0.25f);
       glVertex2f(-0.125f, 0.25f);
    glEnd();
-   
+
    glBegin(GL_LINE_STRIP);
-      glColor3f(1.0f, 1.0f, 1.0f); 
+      glColor3f(1.0f, 1.0f, 1.0f);
       glVertex2f(-0.625f, -0.25f);
       glVertex2f(-0.875f, -0.25f);
       glVertex2f(-0.875f, 0.25f);
@@ -522,10 +522,10 @@ void display_LOSE()
    glFlush();
 }
 
-void specialkey_final(int key, int s, int a)
+void specialkey_final(int key, int s, int a)//final pre-winning function
 {
     if(key == GLUT_KEY_HOME)
-      glutDestroyWindow(WindowID);        
+      glutDestroyWindow(WindowID);
 }
 
 void display()
@@ -547,7 +547,7 @@ void display()
 
 }
 
-void specialFunc(int key, int v, int c)
+void specialFunc(int key, int v, int c)//in game special keyboard input function.
 {
     if(GameCompletion == 0)
     {
@@ -557,27 +557,26 @@ void specialFunc(int key, int v, int c)
     {
         specialkey_final(key,v,c);
     }
-    
+
 }
 
-int main(int argc, char** argv)
+int main(int argc, char** argv)//main function
 {
     srand(time(NULL));
     setup();
-    glutInit(&argc, argv); 
-    //glutInitWindowSize(1000, 1000);   
+    glutInit(&argc, argv);
+    //glutInitWindowSize(1000, 1000);
     //glutInitWindowPosition(400,100);
     WindowID = glutCreateWindow("Maze Runner");
     //glutGetWindow();
-    glutDisplayFunc(display_maze);    
+    glutDisplayFunc(display_maze);
     //glutReshapeFunc(reshape);
     //glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glutIdleFunc(display);
     glutSpecialFunc(specialFunc);
     initGL();
-    glutMainLoop();                 
-    
-    return 0; 
+    glutMainLoop();
+
+    return 0;
 
 }
-
